@@ -223,6 +223,10 @@ celerybeat-schedule
 # SageMath parsed files
 *.sage.py
 
+
+.chalice/deployments/
+.chalice/venv/
+
 # Environments
 .venv
 env/
