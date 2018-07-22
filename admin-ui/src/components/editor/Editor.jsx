@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { TextField, Label } from "office-ui-fabric-react"
+import { TextField, Label, DefaultButton } from "office-ui-fabric-react"
 import ReactMarkdown from "react-markdown"
 
 class Editor extends Component {
@@ -20,9 +20,13 @@ class Editor extends Component {
     })
   }
 
+  clickSubmit = () => {}
+
   render() {
+    const disableButton =
+      this.state.title.length === 0 || this.state.content.length === 0
     return (
-      <div>
+      <div style={editorStyle}>
         <TextField
           label="Story Title"
           required={true}
@@ -38,10 +42,38 @@ class Editor extends Component {
           onChanged={this.contentChange}
         />
         <Label>Preview</Label>
-        <ReactMarkdown source={this.state.content} />
+        <div style={box}>
+          <ReactMarkdown source={this.state.content} />
+        </div>
+        <DefaultButton
+          primary={true}
+          text="Publish"
+          onClick={this.clickSubmit}
+          style={btnStyle}
+          disabled={disableButton}
+        />
       </div>
     )
   }
+}
+
+const editorStyle = {
+  margin: "2em",
+  flexBasis: "50em",
+  display: "flex",
+  flexDirection: "column",
+}
+
+const btnStyle = {
+  width: "3em",
+  alignSelf: "flex-end",
+  marginTop: "1em",
+}
+
+const box = {
+  border: "1px solid #a6a6a6",
+  minHeight: "1em",
+  padding: "0.5em",
 }
 
 export default Editor

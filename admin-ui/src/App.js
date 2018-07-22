@@ -6,12 +6,17 @@ class App extends Component {
   render() {
     return (
       <Fabric>
-        <div className="App">
+        <div className="App" style={style}>
           <Editor />
         </div>
       </Fabric>
     )
   }
+}
+
+const style = {
+  display: "flex",
+  justifyContent: "center",
 }
 
 export default App
