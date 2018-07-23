@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import { TextField, Label, DefaultButton } from "office-ui-fabric-react"
 import ReactMarkdown from "react-markdown"
+import { submitPost } from "../../API"
 
 class Editor extends Component {
   state = {
@@ -20,7 +21,9 @@ class Editor extends Component {
     })
   }
 
-  clickSubmit = () => {}
+  clickSubmit = () => {
+    submitPost({ ...this.state })
+  }
 
   render() {
     const disableButton =

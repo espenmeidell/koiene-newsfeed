@@ -3,14 +3,10 @@ import { Fabric } from "office-ui-fabric-react/lib/Fabric"
 import { BrowserRouter as Router, Route, Link } from "react-router-dom"
 import { DefaultButton } from "office-ui-fabric-react"
 
-import Editor from "./components/editor/Editor"
-import Home from "./components/home/Home"
+import Editor from "./components/Editor/Editor"
+import Home from "./components/Home/Home"
 
 class App extends Component {
-  goTo = route => {
-    this.props.history.replace(`/${route}`)
-  }
-
   render() {
     return (
       <Fabric>
