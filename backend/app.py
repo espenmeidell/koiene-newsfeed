@@ -40,17 +40,17 @@ def persist_post(post):
     POSTS.append(post)
 
 
-@app.route('/posts')
+@app.route('/posts', cors=True)
 def get_posts():
     return get_all_posts()
 
 
-@app.route('/posts/{id}')
+@app.route('/posts/{id}', cors=True)
 def get_post(id):
     return get_single_post(id)
 
 
-@app.route('/posts', methods=['POST'])
+@app.route('/posts', methods=['POST'], cors=True)
 def add_post():
     post = app.current_request.json_body
     post['status'] = "ACTIVE"
