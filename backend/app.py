@@ -1,4 +1,4 @@
-from chalice import Chalice
+from chalice import Chalice, Response
 import uuid
 import time
 
@@ -57,7 +57,7 @@ def add_post():
     post['id'] = str(uuid.uuid4())
     post['timestamp'] = int(time.time())
     persist_post(post)
-    return post
+    return Response(post, status_code=201)
 
 # The view function above will return {"hello": "world"}
 # whenever you make an HTTP GET request to '/'.

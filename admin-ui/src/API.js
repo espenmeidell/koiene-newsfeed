@@ -12,5 +12,5 @@ export async function submitPost(post) {
     headers: new Headers({ "content-type": "application/json" }),
     body: JSON.stringify(post),
   })
-  console.log(response)
+  return response
 }

@@ -1,12 +1,20 @@
 import React, { Component } from "react"
-import { TextField, Label, DefaultButton } from "office-ui-fabric-react"
+import {
+  TextField,
+  Label,
+  DefaultButton,
+  MessageBar,
+  MessageBarType,
+} from "office-ui-fabric-react"
 import ReactMarkdown from "react-markdown"
 import { submitPost } from "../../API"
+import { withRouter } from "react-router"
 
 class Editor extends Component {
   state = {
     title: "",
     content: "",
+    ok: true,
   }
 
   titleChange = title => {
@@ -22,7 +30,13 @@ class Editor extends Component {
   }
 
   clickSubmit = () => {
-    submitPost({ ...this.state })
+    submitPost({ ...this.state }).then(res => {
+      if (res.status === 201) {
+        this.props.history.push("/")
+      } else {
+        this.setState({ ok: false })
+      }
+    })
   }
 
   render() {
@@ -30,6 +44,11 @@ class Editor extends Component {
       this.state.title.length === 0 || this.state.content.length === 0
     return (
       <div style={editorStyle}>
+        {!this.state.ok && (
+          <MessageBar messageBarType={MessageBarType.error} isMultiline={false}>
+            Something went wrong, unable to publish post. Try again later.
+          </MessageBar>
+        )}
         <TextField
           label="Story Title"
           required={true}
@@ -44,7 +63,7 @@ class Editor extends Component {
           value={this.state.content}
           onChanged={this.contentChange}
         />
-        <Label>Preview</Label>
+        <Label>Markdown Preview</Label>
         <div style={box}>
           <ReactMarkdown source={this.state.content} />
         </div>
@@ -79,4 +98,4 @@ const box = {
   padding: "0.5em",
 }
 
-export default Editor
+export default withRouter(Editor)
