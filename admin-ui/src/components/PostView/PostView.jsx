@@ -15,7 +15,7 @@ const PostView = ({ post }) => {
 const style = {
   flex: 1,
   margin: "1em",
-  flexBasis: "25em",
+  flexBasis: "30em",
 }
 
 const titleStyle = {

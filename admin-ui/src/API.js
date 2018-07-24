@@ -1,4 +1,4 @@
-const URL = "http://localhost:8000"
+const URL = "https://yefhbdv5s8.execute-api.eu-central-1.amazonaws.com/api"
 
 export async function getPosts() {
   const data = await fetch(URL + "/posts")

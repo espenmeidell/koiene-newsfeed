@@ -1,8 +1,12 @@
 from chalice import Chalice, Response
 import uuid
 import time
+import boto3
 
 app = Chalice(app_name='backend')
+app.debug = True
+
+USE_DYNAMO = True
 
 
 @app.route('/')
@@ -27,6 +31,14 @@ POSTS = [
     }
 ]
 
+'''
+        DATA PERSISTANCE
+'''
+
+if USE_DYNAMO:
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('KoieneNewsPosts')
+
 
 def get_single_post(id):
     return list(filter(lambda p: p['id'] == id, get_all_posts()))[0]
@@ -37,7 +49,14 @@ def get_all_posts():
 
 
 def persist_post(post):
+    if USE_DYNAMO:
+        table.put_item(Item=post)
     POSTS.append(post)
+
+
+'''
+        ROUTES
+'''
 
 
 @app.route('/posts', cors=True)
@@ -58,23 +77,3 @@ def add_post():
     post['timestamp'] = int(time.time())
     persist_post(post)
     return Response(post, status_code=201)
-
-# The view function above will return {"hello": "world"}
-# whenever you make an HTTP GET request to '/'.
-#
-# Here are a few more examples:
-#
-# @app.route('/hello/{name}')
-# def hello_name(name):
-#    # '/hello/james' -> {"hello": "james"}
-#    return {'hello': name}
-#
-# @app.route('/users', methods=['POST'])
-# def create_user():
-#     # This is the JSON body the user sent in their POST request.
-#     user_as_json = app.current_request.json_body
-#     # We'll echo the json body back to the user in a 'user' key.
-#     return {'user': user_as_json}
-#
-# See the README documentation for more examples.
-#
