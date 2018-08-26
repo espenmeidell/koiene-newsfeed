@@ -2,15 +2,16 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
 
-	jwtmiddleware "github.com/auth0/go-jwt-middleware"
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/auth0-community/auth0"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/satori/go.uuid"
+	jose "gopkg.in/square/go-jose.v2"
 )
 
 type Post struct {
@@ -58,28 +59,28 @@ var createPostHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Req
 })
 
 // AUTH
-var secret = []byte("SECRET")
 
-var getTokenHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	token := jwt.New(jwt.SigningMethodHS256)
+func authMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		secret := []byte(os.Getenv("AUTH0_API_CLIENT_SECRET"))
+		secretProvider := auth0.NewKeyProvider(secret)
+		audience := []string{os.Getenv("AUTH0_API_AUDIENCE")}
 
-	claims := token.Claims.(jwt.MapClaims)
+		configuration := auth0.NewConfiguration(secretProvider, audience, os.Getenv("AUTH0_DOMAIN"), jose.HS256)
+		validator := auth0.NewValidator(configuration, nil)
 
-	claims["admin"] = true
-	claims["name"] = "Ado Kukic"
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
+		token, err := validator.ValidateRequest(r)
 
-	tokenString, _ := token.SignedString(secret)
-
-	w.Write([]byte(tokenString))
-})
-
-var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
-	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-		return secret, nil
-	},
-	SigningMethod: jwt.SigningMethodHS256,
-})
+		if err != nil {
+			fmt.Println(err)
+			fmt.Println("Token is not valid:", token)
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("Unauthorized"))
+		} else {
+			next.ServeHTTP(w, r)
+		}
+	})
+}
 
 func main() {
 	r := mux.NewRouter()
@@ -88,8 +89,7 @@ func main() {
 
 	r.Handle("/status", statusHandler).Methods("GET")
 	r.Handle("/posts", getPostHandler).Methods("GET")
-	r.Handle("/posts", jwtMiddleware.Handler(createPostHandler)).Methods("POST")
-	r.Handle("/get-token", getTokenHandler).Methods("GET")
+	r.Handle("/posts", authMiddleware(createPostHandler)).Methods("POST")
 
 	http.ListenAndServe(":8000", handlers.LoggingHandler(os.Stdout, r))
 }
