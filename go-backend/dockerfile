@@ -10,6 +10,7 @@ RUN go get github.com/auth0-community/auth0
 RUN go get github.com/satori/go.uuid
 RUN go get github.com/auth0/go-jwt-middleware
 RUN go get gopkg.in/square/go-jose.v2
+RUN go get github.com/rs/cors
 
 RUN go build ./main.go
 
